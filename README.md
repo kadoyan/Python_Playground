@@ -1,2 +1,2 @@
 # Pyxel_Playground
-Playground of Pyxel
+Here is my playground with Pyxel.
