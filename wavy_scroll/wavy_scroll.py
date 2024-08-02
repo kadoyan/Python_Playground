@@ -4,6 +4,7 @@ from math import cos, sin
 
 SCREEN_WIDTH = 256
 SCREEN_HEIGHT = 256
+CHECKER_SIZE = 8
 
 # Drawing checkerboard
 class DrawChecker:
@@ -35,6 +36,8 @@ class WaveScreen:
         self.wave_scale = wave_scale
         self.count = 0
         self.screen_ptr = pyxel.screen.data_ptr()
+        self.screen_width = pyxel.screen.width
+        self.screen_height = pyxel.screen.height
     
     # Horizontal
     def horizontal(self):
@@ -44,9 +47,9 @@ class WaveScreen:
         if KeyInput.is_pressed(KeyInput.RIGHT):
             self.shift_x += 0.2
             
-        for y in range(0, self.height, 1):
-            start = y * self.width + self.x
-            end = y * self.width + self.width + self.x
+        for y in range(self.y, self.y + self.height, 1):
+            start = y * self.screen_width + self.x
+            end = y * self.screen_width + self.width + self.x
             source = self.screen_ptr[start:end]
             #Shift data
             shift_list = deque(source)
@@ -63,16 +66,18 @@ class WaveScreen:
         for x in range(0, self.width, 1):
             vertical_collection = []
             for y in range(0, self.height, 1):
-                v_color = self.screen_ptr[self.x + x + y * self.width]
+                point = (self.y + y) * self.screen_width + self.x + x
+                v_color = self.screen_ptr[point]
                 vertical_collection.append(v_color)
             shift_list = deque(vertical_collection)
             shift_list.rotate(int(self.shift_y * sin((self.count + x)/self.wave_scale)))
             for y in range(0, self.height, 1):
-                self.screen_ptr[self.x + x + y * self.width] = shift_list[y]
+                point = (self.y + y) * self.screen_width + self.x + x
+                self.screen_ptr[point] = shift_list[y]
 class App:
     def __init__(self):
         pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, fps=60)
-        self.checker = DrawChecker(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 8)
+        self.checker = DrawChecker(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, CHECKER_SIZE)
         self.wave = WaveScreen(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 8)
         pyxel.run(self.update, self.draw)
 
@@ -84,6 +89,10 @@ class App:
         self.checker.draw()
         self.wave.vertical()
         self.wave.horizontal()
-
+        #GRID
+        for y in range(0, SCREEN_HEIGHT, CHECKER_SIZE):
+            pyxel.line(0, y, SCREEN_WIDTH, y, 0)
+        for x in range(0, SCREEN_WIDTH, CHECKER_SIZE):
+            pyxel.line(x, 0, x, SCREEN_HEIGHT, 0)
 if __name__ == "__main__":
     App()
