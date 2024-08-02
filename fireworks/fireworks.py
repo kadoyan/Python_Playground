@@ -3,7 +3,7 @@ from random import randint, uniform
 from dataclasses import dataclass
 from math import cos, sin, radians, floor
 
-GRAVITY = 0.03
+GRAVITY = 0.02
 HORIZON = 220
 SCREEN_WIDTH = 256
 SCREEN_HEIGHT = 256
@@ -57,6 +57,7 @@ class Fireworks:
         if PressKey.is_pressed(PressKey.KEY):
             new_seed = Seed(randint(40, 215), 255, randint(8, 10))
             self.seeds.append(new_seed)
+            pyxel.play(0, 0)
 
         for i in range(len(self.seeds) - 1, -1, -1):
             seed = self.seeds[i]
@@ -96,8 +97,8 @@ class Fireworks:
             fire.y += fire.gravity
 
             # play sound
-            if floor(fire.radius) == 10:
-                pass
+            if floor(fire.radius) == 15:
+                pyxel.play(1, 1)
 
             if floor(fire.radius) % fire.delay:
                 for n in range(0, 360, 6):
@@ -177,6 +178,7 @@ class App:
         self.copy_screen = CopyScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.wave_screen = WaveScreen(HORIZON, SCREEN_HEIGHT)
         pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, fps=60)
+        pyxel.load("fireworks.pyxres")
         pyxel.run(self.update, self.draw)
 
     def update(self):
