@@ -58,6 +58,7 @@ class WaveScreen:
          
     # Vertical
     def vertical(self):
+        self.count += 1
         if KeyInput.is_pressed(KeyInput.UP):
             self.shift_y -= 0.2
         if KeyInput.is_pressed(KeyInput.DOWN):
