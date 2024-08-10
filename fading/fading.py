@@ -57,7 +57,7 @@ class App:
     def draw(self):
         pyxel.cls(0)
         pyxel.text(2, 100, "Z: Fade In", 15)
-        pyxel.text(2, 110, "X: Fade Oux", 15)
+        pyxel.text(2, 110, "X: Fade Out", 15)
         for c in range(16):
             pyxel.rect(c % 8 * 16, 20 + c // 8 * 16, 16, 16, c)
 
