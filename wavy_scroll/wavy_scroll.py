@@ -26,7 +26,7 @@ class DrawChecker:
 #Make wave
 from collections import deque
 class WaveScreen:
-    def __init__(self, width:int, height:int, x:int, y:int, wave_scale:int):
+    def __init__(self, width:int, height:int, x:int, y:int, wave_scale:int, fill = True):
         self.width = width
         self.height = height
         self.x = x
@@ -38,6 +38,7 @@ class WaveScreen:
         self.screen_ptr = pyxel.screen.data_ptr()
         self.screen_width = pyxel.screen.width
         self.screen_height = pyxel.screen.height
+        self.fill = fill
     
     # Horizontal
     def horizontal(self):
@@ -52,9 +53,13 @@ class WaveScreen:
             end = y * self.screen_width + self.width + self.x
             source = self.screen_ptr[start:end]
             #Shift data
-            shift_list = deque(source)
-            shift_list.rotate(int(self.shift_x * cos((self.count + y)/self.wave_scale)))
-            self.screen_ptr[start:end] = shift_list
+            shift_volume = int(self.shift_x * cos((self.count + y)/self.wave_scale))
+            if self.fill:
+                shifted_list = deque(source)
+                shifted_list.rotate(shift_volume)
+            else:
+                shifted_list = self.shift_list(source, shift_volume, 0)
+            self.screen_ptr[start:end] = shifted_list
          
     # Vertical
     def vertical(self):
@@ -70,16 +75,32 @@ class WaveScreen:
                 point = (self.y + y) * self.screen_width + self.x + x
                 v_color = self.screen_ptr[point]
                 vertical_collection.append(v_color)
-            shift_list = deque(vertical_collection)
-            shift_list.rotate(int(self.shift_y * sin((self.count + x)/self.wave_scale)))
+            # Shift data
+            shift_volume = int(self.shift_y * sin((self.count + x)/self.wave_scale))
+            if self.fill:
+                shifted_list = deque(vertical_collection)
+                shifted_list.rotate(shift_volume)
+            else:
+                shifted_list = self.shift_list(vertical_collection, shift_volume, 0)
             for y in range(0, self.height, 1):
                 point = (self.y + y) * self.screen_width + self.x + x
-                self.screen_ptr[point] = shift_list[y]
+                self.screen_ptr[point] = shifted_list[y]
+                
+    def shift_list(self, lst, shift, fill_value=0):
+        if shift > 0:
+            # Right
+            return [fill_value] * shift + lst[:-shift]
+        elif shift < 0:
+            # Left
+            return lst[-shift:] + [fill_value] * (-shift)
+        else:
+            # none
+            return lst
 class App:
     def __init__(self):
         pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, fps=60)
         self.checker = DrawChecker(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, CHECKER_SIZE)
-        self.wave = WaveScreen(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 8)
+        self.wave = WaveScreen(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 8, False)
         pyxel.run(self.update, self.draw)
 
     def update(self):
