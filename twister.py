@@ -5,6 +5,7 @@ import pyttsx3
 colors = ["赤", "青", "緑", "黄色", "空中"]
 body_parts = ["右手", "右足", "左手", "左足"]
 engine = pyttsx3.init()
+engine.setProperty('rate', 150)
 
 def twister():
     random_color = random.choice(colors)
