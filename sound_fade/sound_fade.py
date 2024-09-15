@@ -1,6 +1,6 @@
 import pyxel
-
 import json
+
 def load_bgm(msc, filename, snd1, snd2, snd3, snd4):
     with open(filename, "rt") as file:
         bgm = json.loads(file.read())
@@ -10,17 +10,17 @@ def load_bgm(msc, filename, snd1, snd2, snd3, snd4):
         pyxel.sounds[snd4].set(*bgm[3])
         pyxel.musics[msc].set([snd1], [snd2], [snd3], [snd4])
 
-
 class App:
     def __init__(self):
         # pyxel初期化
         pyxel.init(
             200, 200, fps=60, display_scale=2, title="Sound Test"
         )
-        self.fade = False
         load_bgm(0, "assets/esperdream.json", 16, 17, 18, 19)
 
-        print(pyxel.tones[0].gain)
+        self.fade = False
+        
+        # gain初期値を記録
         self.default_gain = []
         for tone in pyxel.tones:
             self.default_gain.append(tone.gain)
@@ -31,16 +31,7 @@ class App:
         # BGM
         if pyxel.play_pos(0) is None:
             pyxel.playm(0, loop=True)
-
-        # if pyxel.btnp(pyxel.KEY_UP):
-        #     pyxel.play(1, 0, resume=True)
-        # if pyxel.btnp(pyxel.KEY_DOWN):
-        #     pyxel.play(1, 1, resume=True)
-        # if pyxel.btnp(pyxel.KEY_LEFT):
-        #     pyxel.play(3, 3, resume=True)
-        # if pyxel.btnp(pyxel.KEY_RIGHT):
-        #     pyxel.play(3, 5, resume=True)
-
+            
         if pyxel.btnp(pyxel.KEY_SPACE):
             self.fade = not self.fade
 
@@ -65,7 +56,6 @@ class App:
                 str(f"pyxel.tones[{idx}].gain = {tone.gain}"),
                 10 + idx,
             )
-
 
 if __name__ == "__main__":
     App()
