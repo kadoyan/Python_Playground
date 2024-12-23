@@ -1,8 +1,5 @@
 import pyxel
-from dataclasses import dataclass
-from collections import deque
 
-@dataclass
 class TileShift:
     def __init__(self, bank, speed_h, u, v, timing, width=8, height=8, delay=False):
         """
@@ -44,7 +41,13 @@ class TileShift:
     def shift_line(self, y):
         cell = self.u + (self.v + y) * 256
         source = self.screen_ptr[cell:cell + self.width]
-        shifted = deque(source)
-        shifted.rotate(self.speed_h)
+        shifted = self.rotate(source, self.speed_h)
         self.screen_ptr[cell:cell + self.width] = shifted
         
+    def rotate(self, list, n):
+        if not list: # empty list
+            return list
+        length = len(list)
+        n = n % length
+        # n<0: left / n>0: right
+        return list[-n:] + list[:-n]
